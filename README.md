@@ -7,7 +7,7 @@ Write code to find the roots of arbitrary polynomials.  The coefficients of the 
 
 Given the coefficients for the polynomial p(x):
 
-     Calculate the the root of p(x) within [a,b] using the bisection method
+    Calculate the the root of p(x) within [a,b] using the bisection method
     Calculate the root of p(x) using Newton's method with x0=(a+b)/2
     Use Horner's method to calculate p(x) and p'(x) efficiently
 
