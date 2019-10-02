@@ -22,10 +22,11 @@ struct polydat GetPolyData()
 
 	printf("Please Enter Coefficient And Exponents");
 
-	for(int i=0; i<=polyInfo.termCount; i++)
+	for(int i=0; i<polyInfo.termCount; i++)
 	{
 		printf("Coefficient %d: ",i+1);
-		scanf("%lf", polyInfo
+		scanf("%lf", &polyInfo.coexpo[i][0]);
+	}
 
 	return polyInfo;
 }
