@@ -1,0 +1,40 @@
+/* Author: Hamza Syed */
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#include "structs.h"
+
+struct polydat GetPolyData();
+
+int main()
+{
+	struct polydat polyInfo = GetPolyData();
+	return 0;
+}
+
+struct polydat GetPolyData()
+{
+	struct polydat polyInfo;
+
+
+	printf("Please Enter Terms Count: ");
+	scanf("%d",&polyInfo.termCount);
+
+	polyInfo.coexpo
+
+	printf("Please Enter Coefficient And Exponents\n");
+
+	for(int i=0; i<polyInfo.termCount; i++)
+	{
+		printf("Coefficient %d: ",i+1);
+		scanf("%d", &polyInfo.coexpo[i][0]);
+
+		printf("Exponent %d: ",i+1);
+		scanf("%d", &polyInfo.coexpo[i][1]);
+
+		printf("C%d\tE%d\n", polyInfo.coexpo[i][0],polyInfo.coexpo[i][0]);
+	}
+
+	return polyInfo;
+}

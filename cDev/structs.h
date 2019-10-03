@@ -4,6 +4,6 @@ struct polydat
 {
 	int termCount;
 	int a,b;
-	double coexpo[][1];
+	int coexpo[499][1];
 };
 #endif
