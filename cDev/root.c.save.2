@@ -1,0 +1,60 @@
+/* Author: Hamza Syed */
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#include "structs.h"
+
+#define CHUNK 499
+
+struct polydat GetPolyData();
+
+int main()
+{
+	struct polydat polyInfo = GetPolyData();
+	printf("%s", polyInfo.expression);
+
+	return 0;
+}
+
+struct polydat GetPolyData()
+{
+	char userin[CHUNK];
+	char delimit[] = " xX()^";
+	int coe=0;
+	int expo=0;
+	int ceFlag=0; //0=coefficent :: 1=exponent
+
+	struct polydat polyInfo;
+
+	printf("Please enter your polynomial: ");
+	fgets(userin, CHUNK, stdin);
+
+	char *userinToken = strtok(userin,delimit);
+	while(userinToken)
+	{
+		printf("\n%s",userinToken);
+		if(ceFlag==0)
+		{
+			polyInfo.coexpo[coe][expo] = atoi(userinToken);
+			ceFlag=1;
+		}
+		else
+		{
+			polyInfo.coexpo[coe][expo] = atoi(userinToken);
+			ceFlag=0;
+		}
+		userinToken = strtok(NULL,delimit);
+	}
+
+	for(int i=0; i<499; i++)
+	{;
+		printf("coe:%d\texpo:%d
+
+
+	printf("%s", userin);
+
+	polyInfo.expression = userin;
+
+	return polyInfo;
+}

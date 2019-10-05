@@ -13,6 +13,14 @@ int main()
 {
 	struct polydat polyInfo = GetPolyData();
 
+/*	int term=0;
+	printf("\nSorted Polys\n");
+	while(polyInfo.coexpo[term][0]!=0 && polyInfo.coexpo[term][1]!=0)
+	{
+		printf("\n%d\ncoe:%d\texpo:%d\n",term , polyInfo.coexpo[term][0], polyInfo.coexpo[term][1]);
+		term++;
+	}
+*/
 	return 0;
 }
 
@@ -30,6 +38,7 @@ struct polydat GetPolyData()
 
 	char *userinToken = strtok(userin,delimit);
 	int inAt=0;
+	char *val;
 	while(userinToken)
 	{
 
@@ -43,7 +52,10 @@ struct polydat GetPolyData()
 		}
 
 		polyInfo.coexpo[inAt][0] = atoi(userinToken) * sFlag;
-		polyInfo.coexpo[inAt][1] = atoi(strtok(NULL,delimit));
+		if((val = strtok(NULL,delimit))!=NULL)
+			polyInfo.coexpo[inAt][1] = atoi(val);
+		else
+			polyInfo.coexpo[inAt][1] = 0;
 
 		printf("\n%d\ncoe:%d\texpo:%d\n",inAt , polyInfo.coexpo[inAt][0], polyInfo.coexpo[inAt][1]);
 
@@ -51,6 +63,35 @@ struct polydat GetPolyData()
 		userinToken = strtok(NULL,delimit);
 	}
 
+	int term=0;
+	printf("\nSorted Polys\n");
+	while(polyInfo.coexpo[term][0]!=0 && polyInfo.coexpo[term][1]!=0)
+	{
+		printf("\n%d\ncoe:%d\texpo:%d\n",term , polyInfo.coexpo[term][0], polyInfo.coexpo[term][1]);
+		term++;
+	}
+
+
+/*	int *swap;
+	for(int i=0; i<CHUNK; i++)
+	{
+		for(int j=0; j<CHUNK-i; j++)
+		{
+			if(polyInfo.coexpo[j][1]>polyInfo.coexpo[j+1][1]
+				&& polyInfo.coexpo[j+1][0] != 0
+				&& polyInfo.coexpo[j+1][1] != 0)
+			{
+				for(int k=0; k<1; k++)
+				{
+					int temp;
+					temp = polyInfo.coexpo[j][k];
+					polyInfo.coexpo[j][k] = polyInfo.coexpo[j+1][k];
+					polyInfo.coexpo[j+1][k] = temp;
+				}
+			}
+		}
+	}
+*/
 	printf("please enter the range:");
 	scanf("%d %d",&polyInfo.a,&polyInfo.b);
 
