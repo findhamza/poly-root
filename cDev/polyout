@@ -1,0 +1,25 @@
+Please enter your polynomial: (5x^7)+(3x^6)-(8x^2)+9
+
+
+0
+coe:5	expo:7	expoval
+
+1
+coe:3	expo:6	expoval
+
+2
+coe:-8	expo:2	expoval
+
+3
+coe:-9	expo:0	expoval
+5 3
+3 -8
+-8 -9
+-9 0
+0 0
+0 0
+0 0
+0 0
+0 0
+0 0
+please enter the range:

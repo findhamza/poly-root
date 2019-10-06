@@ -35,10 +35,12 @@ struct polydat GetPolyData()
 
 	printf("Please enter your polynomial: ");
 	fgets(userin, CHUNK, stdin);
+	printf("%s\n",userin);
 
 	char *userinToken = strtok(userin,delimit);
 	int inAt=0;
 	char *val;
+	int expoval=0;
 	while(userinToken)
 	{
 
@@ -53,23 +55,19 @@ struct polydat GetPolyData()
 
 		polyInfo.coexpo[inAt][0] = atoi(userinToken) * sFlag;
 		if((val = strtok(NULL,delimit))!=NULL)
-			polyInfo.coexpo[inAt][1] = atoi(val);
+			expoval = atoi(val);
 		else
-			polyInfo.coexpo[inAt][1] = 0;
+			expoval = 0;
+			polyInfo.coexpo[inAt][1] = expoval;
 
-		printf("\n%d\ncoe:%d\texpo:%d\n",inAt , polyInfo.coexpo[inAt][0], polyInfo.coexpo[inAt][1]);
+		printf("\n%d\ncoe:%d\texpo:%d\texpoval\n",inAt , polyInfo.coexpo[inAt][0], polyInfo.coexpo[inAt][1]);
 
 		inAt++;
 		userinToken = strtok(NULL,delimit);
 	}
 
-	int term=0;
-	printf("\nSorted Polys\n");
-	while(polyInfo.coexpo[term][0]!=0 && polyInfo.coexpo[term][1]!=0)
-	{
-		printf("\n%d\ncoe:%d\texpo:%d\n",term , polyInfo.coexpo[term][0], polyInfo.coexpo[term][1]);
-		term++;
-	}
+	for(int i=0; i<10; i++)
+		printf("%d %d\n",polyInfo.coexpo[i][0],polyInfo.coexpo[i][1]);
 
 
 /*	int *swap;
