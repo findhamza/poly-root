@@ -58,12 +58,15 @@ struct polydat GetPolyData()
 			expoval = atoi(val);
 		else
 			expoval = 0;
-			polyInfo.coexpo[inAt][1] = expoval;
+		polyInfo.coexpo[inAt][1] = expoval;
 
-		printf("\n%d\ncoe:%d\texpo:%d\texpoval\n",inAt , polyInfo.coexpo[inAt][0], polyInfo.coexpo[inAt][1]);
+		printf("\n%d\ncoe:%d\texpo:%d\texpoval:%d\n",inAt , polyInfo.coexpo[inAt][0], polyInfo.coexpo[inAt][1],expoval);
 
 		inAt++;
-		userinToken = strtok(NULL,delimit);
+		if(val==NULL)
+			break;
+		else
+			userinToken = strtok(NULL,delimit);
 	}
 
 	for(int i=0; i<10; i++)
