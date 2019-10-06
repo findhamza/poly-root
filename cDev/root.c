@@ -13,14 +13,16 @@ int main()
 {
 	struct polydat polyInfo = GetPolyData();
 
-/*	int term=0;
-	printf("\nSorted Polys\n");
-	while(polyInfo.coexpo[term][0]!=0 && polyInfo.coexpo[term][1]!=0)
+	int term=0;
+	printf("\n\nPoly\n");
+	while(term!=polyInfo.termCount)
 	{
-		printf("\n%d\ncoe:%d\texpo:%d\n",term , polyInfo.coexpo[term][0], polyInfo.coexpo[term][1]);
+		printf("(%dx^%d)", polyInfo.coexpo[term][0], polyInfo.coexpo[term][1]);
+		if(term<polyInfo.termCount-1)
+			printf("+");
 		term++;
 	}
-*/
+
 	return 0;
 }
 
@@ -64,7 +66,7 @@ struct polydat GetPolyData()
 			expoval = 0;
 		polyInfo.coexpo[inAt][1] = expoval;
 
-		printf("\n%d\ncoe:%d\texpo:%d\texpoval:%d\n",inAt , polyInfo.coexpo[inAt][0], polyInfo.coexpo[inAt][1],expoval);
+		printf("\n%d\ncoe:%d\texpo:%d\n",inAt , polyInfo.coexpo[inAt][0], polyInfo.coexpo[inAt][1]);
 
 		inAt++;
 		if(val==NULL)
@@ -73,32 +75,31 @@ struct polydat GetPolyData()
 			userinToken = strtok(NULL,delimit);
 	}
 
-	for(int i=0; i<10; i++)
-		printf("%d %d\n",polyInfo.coexpo[i][0],polyInfo.coexpo[i][1]);
+/*	int termCount=0;
+	while(polyInfo.coexpo[termCount][0]!=0 && polyInfo.coexpo[termCount][1]!=0)
+		termCount++;
+	printf("termcount: %d",termCount);
+*/	polyInfo.termCount = inAt;
 
-
-/*	int *swap;
-	for(int i=0; i<CHUNK; i++)
+	char response[2]="";
+	printf("\nPlease enter point a: ");
+	scanf("%d",&polyInfo.a); printf("%d\n",polyInfo.a);
+	printf("Please enter point b: ");
+	scanf("%d",&polyInfo.b); printf("%d\n",polyInfo.b);
+	while(polyInfo.a>polyInfo.b)
 	{
-		for(int j=0; j<CHUNK-i; j++)
+		printf("\nLooks like a is larger than b\nRetry? (y,n) => ");
+		scanf("%s",response);
+		if(strcmp(response,"y")==0)
 		{
-			if(polyInfo.coexpo[j][1]>polyInfo.coexpo[j+1][1]
-				&& polyInfo.coexpo[j+1][0] != 0
-				&& polyInfo.coexpo[j+1][1] != 0)
-			{
-				for(int k=0; k<1; k++)
-				{
-					int temp;
-					temp = polyInfo.coexpo[j][k];
-					polyInfo.coexpo[j][k] = polyInfo.coexpo[j+1][k];
-					polyInfo.coexpo[j+1][k] = temp;
-				}
-			}
+			printf("Please enter point a: ");
+			scanf("%d",&polyInfo.a);
+			printf("Please enter point b: ");
+			scanf("%d",&polyInfo.b);
 		}
+		else
+			exit(1);
 	}
-*/
-	printf("please enter the range:");
-	scanf("%d %d",&polyInfo.a,&polyInfo.b);
 
 
 	return polyInfo;
