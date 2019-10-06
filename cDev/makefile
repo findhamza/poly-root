@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-I.
+CFLAGS=-I. -lm
 DEPS = structs.h
 OBJ = root.o
 
@@ -7,4 +7,4 @@ OBJ = root.o
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 root: $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS)
+	$(CC) -o $@ $^ $(CFLAGS) -O3

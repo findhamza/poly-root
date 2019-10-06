@@ -2,26 +2,25 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
+#include <float.h>
 
 #include "structs.h"
 
 #define CHUNK 499
+#define EPSILON 0.00000000000001
 
 struct polydat GetPolyData();
+void reconstruct(struct polydat);
+double function(struct polydat, double);
+double bisect(struct polydat, double, double);
 
 int main()
 {
 	struct polydat polyInfo = GetPolyData();
+	reconstruct(polyInfo);
 
-	int term=0;
-	printf("\n\nPoly\n");
-	while(term!=polyInfo.termCount)
-	{
-		printf("(%dx^%d)", polyInfo.coexpo[term][0], polyInfo.coexpo[term][1]);
-		if(term<polyInfo.termCount-1)
-			printf("+");
-		term++;
-	}
+	printf("\n\nBisected[%lf,%lf]: %lf", polyInfo.a, polyInfo.b, bisect(polyInfo, polyInfo.a, polyInfo.b));
 
 	return 0;
 }
@@ -75,17 +74,13 @@ struct polydat GetPolyData()
 			userinToken = strtok(NULL,delimit);
 	}
 
-/*	int termCount=0;
-	while(polyInfo.coexpo[termCount][0]!=0 && polyInfo.coexpo[termCount][1]!=0)
-		termCount++;
-	printf("termcount: %d",termCount);
-*/	polyInfo.termCount = inAt;
+	polyInfo.termCount = inAt;
 
 	char response[2]="";
 	printf("\nPlease enter point a: ");
-	scanf("%d",&polyInfo.a); printf("%d\n",polyInfo.a);
+	scanf("%lf",&polyInfo.a); printf("%lf\n",polyInfo.a);
 	printf("Please enter point b: ");
-	scanf("%d",&polyInfo.b); printf("%d\n",polyInfo.b);
+	scanf("%lf",&polyInfo.b); printf("%lf\n",polyInfo.b);
 	while(polyInfo.a>polyInfo.b)
 	{
 		printf("\nLooks like a is larger than b\nRetry? (y,n) => ");
@@ -93,9 +88,9 @@ struct polydat GetPolyData()
 		if(strcmp(response,"y")==0)
 		{
 			printf("Please enter point a: ");
-			scanf("%d",&polyInfo.a);
+			scanf("%lf",&polyInfo.a);
 			printf("Please enter point b: ");
-			scanf("%d",&polyInfo.b);
+			scanf("%lf",&polyInfo.b);
 		}
 		else
 			exit(1);
@@ -103,4 +98,45 @@ struct polydat GetPolyData()
 
 
 	return polyInfo;
+}
+
+void reconstruct(struct polydat polyInfo)
+{
+	int term=0;
+	printf("\n\nReconstructed Poly\n");
+	while(term!=polyInfo.termCount)
+	{
+		printf("(%dx^%d)", polyInfo.coexpo[term][0], polyInfo.coexpo[term][1]);
+		if(term<polyInfo.termCount-1)
+			printf("+");
+		term++;
+	}
+	printf("\n\n");
+}
+
+double function(struct polydat polyInfo, double x)
+{
+	double funcVal=0;
+	for(int i=0; i<=polyInfo.termCount; i++)
+	{
+		funcVal += polyInfo.coexpo[i][0] * pow(x,polyInfo.coexpo[i][1]);
+
+	}
+	return funcVal;
+}
+
+double bisect(struct polydat polyInfo, double a, double b)
+{
+	double mid = (a+b)/2;
+
+	printf("\nf(%lf/%lf=%lf)=%.16lf", a, b, mid, function(polyInfo, mid));
+
+	if(function(polyInfo, mid)==0 || (function(polyInfo, mid) < EPSILON && function(polyInfo, mid) > -EPSILON))
+		return mid;
+	else if(function(polyInfo, mid)*function(polyInfo, b)<0)
+		return bisect(polyInfo, mid, b);
+	else
+		return bisect(polyInfo, a, mid);
+
+	return DBL_MAX;
 }
