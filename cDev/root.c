@@ -53,7 +53,11 @@ struct polydat GetPolyData()
 			userinToken = strtok(NULL,delimit);
 		}
 
-		polyInfo.coexpo[inAt][0] = atoi(userinToken) * sFlag;
+		if(atoi(userinToken)>0)
+			polyInfo.coexpo[inAt][0] = atoi(userinToken) * sFlag;
+		else
+			polyInfo.coexpo[inAt][0] = atoi(userinToken);
+
 		if((val = strtok(NULL,delimit))!=NULL)
 			expoval = atoi(val);
 		else
