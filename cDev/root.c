@@ -5,15 +5,17 @@
 #include <math.h>
 #include <float.h>
 
-#include "structs.h"
+#include "structs.h"				//contains polydat
 
-#define CHUNK 499
-#define EPSILON 0.00000000000001
+#define CHUNK 499				//defines max input possible
+#define EPSILON 0.00000000000001		//defines max accuracy for double precision
 
-struct polydat GetPolyData();
-void reconstruct(struct polydat);
-double function(struct polydat, double);
-double bisect(struct polydat, double, double);
+struct polydat GetPolyData();			//Constructs the polydat structure from user input
+void reconstruct(struct polydat);		//reconstructs the polynomial from info in polydat
+double function(struct polydat, double);	//returns the f(x)
+double bisect(struct polydat, double, double);	//Uses the bisection method to find root
+int** nDerivative(struct polydat,int);		//finds the nth derivative of a polynomial
+void destroyArr(int**);				//mainly made to destroy nDerivative 2d arrays
 
 int main()
 {
@@ -125,8 +127,17 @@ double function(struct polydat polyInfo, double x)
 	return funcVal;
 }
 
+int** nDerivative(struct polydat polyInfo, int n)
+{
+	int* values = calloc(polyInfo.termCount*2, sizeof(int));
+	int** rows = malloc(2*sizeof(int*));
+
+	return rows;
+}
+
 double bisect(struct polydat polyInfo, double a, double b)
 {
+
 	double mid = (a+b)/2;
 
 	printf("\nf(%lf/%lf=%lf)=%.16lf", a, b, mid, function(polyInfo, mid));
