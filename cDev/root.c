@@ -17,9 +17,9 @@ double function(struct polydat, double);	//returns the f(x)
 double bisect(struct polydat, double, double);	//Uses the bisection method to find root
 int** nDerivative(struct polydat,int);		//finds the nth derivative of a polynomial
 void destroyArr(int**);				//mainly made to destroy nDerivative 2d arrays
-bool precision(struct polydat, double);
-double newton(struct polydat);
-double horner(struct polydat, int);
+bool precision(struct polydat, double);		//used to determine how close to zero our value is
+double newton(struct polydat);			//Uses the newtons method to find root
+double horner(struct polydat, int);		//
 
 int main()
 {
@@ -35,8 +35,11 @@ int main()
 
 	reconstruct(polyInfo);
 */
-	printf("\n\nBisected[%lf,%lf]: %lf", polyInfo.a, polyInfo.b, bisect(polyInfo, polyInfo.a, polyInfo.b));
-	printf("\n\nNetwonsR[%lf,%lf]: %lf", polyInfo.a, polyInfo.b, newton(polyInfo));
+	printf("\n\nBisected[%lf,%lf]: %lf\n", polyInfo.a, polyInfo.b, bisect(polyInfo, polyInfo.a, polyInfo.b));
+	printf("\n\nNetwonsR[%lf,%lf]: %lf\n", polyInfo.a, polyInfo.b, newton(polyInfo));
+
+	horner(polyInfo,1);
+
 	return 0;
 }
 
@@ -173,6 +176,12 @@ int** nDerivative(struct polydat polyInfo, int n)
 	return nDer;
 }
 
+void destroyArr(int** arr)
+{
+	free(*arr);
+	free(arr);
+}
+
 double bisect(struct polydat polyInfo, double a, double b)
 {
 
@@ -207,14 +216,40 @@ double newton(struct polydat polyInfo)
 
 	while(!precision(polyInfo,xNext))
 	{
-//		printf("\n%lf",xNext);
-		xNext = xNext - (function(polyInfo,xNext)/function(firstDer,xNext));
+		int firstDerVal = function(firstDer,xNext);
+		if(precision(firstDer,xNext))
+			firstDerVal+=EPSILON;
+		printf("\n%.16lf",function(polyInfo,xNext));
+		xNext = xNext - (function(polyInfo,xNext)/firstDerVal);
+		printf("=>%.16lf",function(polyInfo,xNext));
 	}
 
+	destroyArr(der);
 	return xNext;
 }
 
 double horner(struct polydat polyInfo, int x)
 {
+	int maxExpo = 0;
+	int minExpo = 0;
+
+	for(int i=0; i<=polyInfo.termCount; i++)
+	{
+		if(maxExpo<polyInfo.coexpo[i][1])
+			maxExpo = polyInfo.coexpo[i][1];
+		if(minExpo>polyInfo.coexpo[i][1])
+			minExpo = polyInfo.coexpo[i][1];
+	}
+
+	int arrSize = maxExpo-minExpo;
+	int *coeArr = (int*) malloc(sizeof(int*)*arrSize); 	//rowcount = termcount
+	for(int i=0; i<=polyInfo.termCount; i++)
+		coeArr[polyInfo.coexpo[i][1]] += polyInfo.coexpo[i][0];
+
+	for(int i=0; i<=arrSize; i++)
+		printf("%d,",coeArr[i]);
+
+	printf("\nmaxExpo: %d\tminExpo: %d\tsize: %d",maxExpo,minExpo,maxExpo-minExpo);
+
 	return 0;
 }
