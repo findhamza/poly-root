@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include <float.h>
-#include <stdbool.h>
 
 #include "structs.h"				//contains polydat
 
@@ -17,26 +16,14 @@ double function(struct polydat, double);	//returns the f(x)
 double bisect(struct polydat, double, double);	//Uses the bisection method to find root
 int** nDerivative(struct polydat,int);		//finds the nth derivative of a polynomial
 void destroyArr(int**);				//mainly made to destroy nDerivative 2d arrays
-bool precision(struct polydat, double);
-double newton(struct polydat);
-double horner(struct polydat, int);
 
 int main()
 {
 	struct polydat polyInfo = GetPolyData();
 	reconstruct(polyInfo);
 
-/*	int** der = nDerivative(polyInfo,7);
-	for(int i=0; i<polyInfo.termCount; i++)
-	{
-		polyInfo.coexpo[i][0] = der[i][0];
-		polyInfo.coexpo[i][1] = der[i][1];
-	}
-
-	reconstruct(polyInfo);
-*/
 	printf("\n\nBisected[%lf,%lf]: %lf", polyInfo.a, polyInfo.b, bisect(polyInfo, polyInfo.a, polyInfo.b));
-	printf("\n\nNetwonsR[%lf,%lf]: %lf", polyInfo.a, polyInfo.b, newton(polyInfo));
+
 	return 0;
 }
 
@@ -140,37 +127,14 @@ double function(struct polydat polyInfo, double x)
 	return funcVal;
 }
 
-bool precision(struct polydat polyInfo, double x)
-{
-	int value = function(polyInfo,x);
-	if(function(polyInfo, x)==0 || (function(polyInfo, x) < EPSILON && function(polyInfo, x) > -EPSILON))
-	{
-		return true;
-	}
-
-	return false;
-}
-
 int** nDerivative(struct polydat polyInfo, int n)
 {
-	int **nDer = (int**) malloc(sizeof(int*)*polyInfo.termCount); 	//rowcount = termcount
-	for(int i=0; i<polyInfo.termCount; i++)				//columncount = 2
-	{
-		nDer[i] = (int*) malloc(sizeof(int)*2);
+	int* values = calloc(polyInfo.termCount*2, sizeof(int));
+	int** rows = malloc(2*sizeof(int*));
 
-		int coe = polyInfo.coexpo[i][0];
-		int expo = polyInfo.coexpo[i][1];
-		for(int j=0; j<n; j++)
-		{
-			coe = coe*expo;
-			expo--;
-		}
+	
 
-		nDer[i][0] = coe;
-		nDer[i][1] = expo;
-	}
-
-	return nDer;
+	return rows;
 }
 
 double bisect(struct polydat polyInfo, double a, double b)
@@ -180,7 +144,7 @@ double bisect(struct polydat polyInfo, double a, double b)
 
 	printf("\nf(%lf/%lf=%lf)=%.16lf", a, b, mid, function(polyInfo, mid));
 
-	if(precision(polyInfo,mid))
+	if(function(polyInfo, mid)==0 || (function(polyInfo, mid) < EPSILON && function(polyInfo, mid) > -EPSILON))
 		return mid;
 	else if(function(polyInfo, mid)*function(polyInfo, b)<0)
 		return bisect(polyInfo, mid, b);
@@ -188,33 +152,4 @@ double bisect(struct polydat polyInfo, double a, double b)
 		return bisect(polyInfo, a, mid);
 
 	return DBL_MAX;
-}
-
-double newton(struct polydat polyInfo)
-{
-	double xInit = (polyInfo.a+polyInfo.b)/2;
-	double xNext = xInit;
-
-	struct polydat firstDer = polyInfo;
-
-	int** der = nDerivative(firstDer,1);
-	for(int i=0; i<firstDer.termCount; i++)
-	{
-		firstDer.coexpo[i][0] = der[i][0];
-		firstDer.coexpo[i][1] = der[i][1];
-	}
-
-
-	while(!precision(polyInfo,xNext))
-	{
-//		printf("\n%lf",xNext);
-		xNext = xNext - (function(polyInfo,xNext)/function(firstDer,xNext));
-	}
-
-	return xNext;
-}
-
-double horner(struct polydat polyInfo, int x)
-{
-	return 0;
 }
