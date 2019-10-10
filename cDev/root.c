@@ -16,7 +16,9 @@ void reconstruct(struct polydat);		//reconstructs the polynomial from info in po
 double function(struct polydat, double);	//returns the f(x)
 double bisect(struct polydat, double, double);	//Uses the bisection method to find root
 int** nDerivative(struct polydat,int);		//finds the nth derivative of a polynomial
-void destroyArr(int**);				//mainly made to destroy nDerivative 2d arrays
+void destroyArr2d(int**);			//mainly made to destroy nDerivative 2d arrays
+void destroyArr(int*);
+int* normArr(struct polydat);
 bool precision(struct polydat, double);		//used to determine how close to zero our value is
 double newton(struct polydat);			//Uses the newtons method to find root
 double horner(struct polydat, int);		//
@@ -38,7 +40,8 @@ int main()
 	printf("\n\nBisected[%lf,%lf]: %lf\n", polyInfo.a, polyInfo.b, bisect(polyInfo, polyInfo.a, polyInfo.b));
 	printf("\n\nNetwonsR[%lf,%lf]: %lf\n", polyInfo.a, polyInfo.b, newton(polyInfo));
 
-	horner(polyInfo,1);
+	printf("\n\nF(%d): %lf\nHorner-F(%d): %lf",2,function(polyInfo,2),
+							2,horner(polyInfo,2));
 
 	return 0;
 }
@@ -176,9 +179,14 @@ int** nDerivative(struct polydat polyInfo, int n)
 	return nDer;
 }
 
-void destroyArr(int** arr)
+void destroyArr2d(int** arr)
 {
 	free(*arr);
+	free(arr);
+}
+
+void destroyArr(int* arr)
+{
 	free(arr);
 }
 
@@ -224,11 +232,11 @@ double newton(struct polydat polyInfo)
 		printf("=>%.16lf",function(polyInfo,xNext));
 	}
 
-	destroyArr(der);
+	destroyArr2d(der);
 	return xNext;
 }
 
-double horner(struct polydat polyInfo, int x)
+int* normArr(struct polydat polyInfo)
 {
 	int maxExpo = 0;
 	int minExpo = 0;
@@ -246,10 +254,22 @@ double horner(struct polydat polyInfo, int x)
 	for(int i=0; i<=polyInfo.termCount; i++)
 		coeArr[polyInfo.coexpo[i][1]] += polyInfo.coexpo[i][0];
 
-	for(int i=0; i<=arrSize; i++)
-		printf("%d,",coeArr[i]);
+	return coeArr;
+}
 
-	printf("\nmaxExpo: %d\tminExpo: %d\tsize: %d",maxExpo,minExpo,maxExpo-minExpo);
+double horner(struct polydat polyInfo, int x)
+{
+	int *coeArr = normArr(polyInfo);
+	size_t coeArrSize = sizeof(coeArr)/sizeof(*coeArr);
+	double funcVal = coeArr[0];
+	double derVal = 0;
 
-	return 0;
+	for(int i=1; i<coeArrSize; i++)
+	{
+		printf("\n%ld\n",coeArrSize);
+		funcVal = coeArr[i] + (x * funcVal);
+	}
+
+
+	return funcVal;
 }
