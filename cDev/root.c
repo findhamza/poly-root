@@ -5,6 +5,7 @@
 #include <math.h>
 #include <float.h>
 #include <stdbool.h>
+#include <limits.h>
 
 #include "structs.h"				//contains polydat
 
@@ -19,6 +20,8 @@ int** nDerivative(struct polydat,int);		//finds the nth derivative of a polynomi
 void destroyArr2d(int**);			//mainly made to destroy nDerivative 2d arrays
 void destroyArr(int*);
 int* normArr(struct polydat);
+int minExpo(struct polydat);
+int maxExpo(struct polydat);
 bool precision(struct polydat, double);		//used to determine how close to zero our value is
 double newton(struct polydat);			//Uses the newtons method to find root
 double horner(struct polydat, int);		//
@@ -40,8 +43,7 @@ int main()
 	printf("\n\nBisected[%lf,%lf]: %lf\n", polyInfo.a, polyInfo.b, bisect(polyInfo, polyInfo.a, polyInfo.b));
 	printf("\n\nNetwonsR[%lf,%lf]: %lf\n", polyInfo.a, polyInfo.b, newton(polyInfo));
 
-	printf("\n\nF(%d): %lf\nHorner-F(%d): %lf",2,function(polyInfo,2),
-							2,horner(polyInfo,2));
+	printf("\n\nF(2): %lf\nHorner-F(2): %lf", function(polyInfo,2), horner(polyInfo,2));
 
 	return 0;
 }
@@ -238,36 +240,53 @@ double newton(struct polydat polyInfo)
 
 int* normArr(struct polydat polyInfo)
 {
-	int maxExpo = 0;
-	int minExpo = 0;
+	reconstruct(polyInfo);
 
-	for(int i=0; i<=polyInfo.termCount; i++)
-	{
-		if(maxExpo<polyInfo.coexpo[i][1])
-			maxExpo = polyInfo.coexpo[i][1];
-		if(minExpo>polyInfo.coexpo[i][1])
-			minExpo = polyInfo.coexpo[i][1];
-	}
-
-	int arrSize = maxExpo-minExpo;
+	int arrSize = maxExpo(polyInfo) - minExpo(polyInfo);
 	int *coeArr = (int*) malloc(sizeof(int*)*arrSize); 	//rowcount = termcount
 	for(int i=0; i<=polyInfo.termCount; i++)
+	{
 		coeArr[polyInfo.coexpo[i][1]] += polyInfo.coexpo[i][0];
+		printf("\ncoeArr[%d] == %d\n",polyInfo.coexpo[i][1], polyInfo.coexpo[i][0]);
+	}
 
 	return coeArr;
+}
+
+int minExpo(struct polydat polyInfo)
+{
+	int minExpo = INT_MAX;
+
+	for(int i=0; i<=polyInfo.termCount; i++)
+		if(minExpo>polyInfo.coexpo[i][1])
+			minExpo = polyInfo.coexpo[i][1];
+
+	return minExpo;
+}
+
+int maxExpo(struct polydat polyInfo)
+{
+	int maxExpo = 0;
+
+	for(int i=0; i<=polyInfo.termCount; i++)
+		if(maxExpo<polyInfo.coexpo[i][1])
+			maxExpo = polyInfo.coexpo[i][1];
+
+	return maxExpo;
 }
 
 double horner(struct polydat polyInfo, int x)
 {
 	int *coeArr = normArr(polyInfo);
-	size_t coeArrSize = sizeof(coeArr)/sizeof(*coeArr);
-	double funcVal = coeArr[0];
+	size_t coeArrSize = maxExpo(polyInfo) - minExpo(polyInfo);
+	double funcVal = coeArr[coeArrSize];
 	double derVal = 0;
+		printf("\n%d and funcVal=%lf\n",coeArr[0],funcVal);
 
-	for(int i=1; i<coeArrSize; i++)
+	for(int i=coeArrSize-1; i>=0; i--)
 	{
-		printf("\n%ld\n",coeArrSize);
 		funcVal = coeArr[i] + (x * funcVal);
+		printf("\n%d and funcVal=%lf\n",coeArr[i],funcVal);
 	}
 
 
