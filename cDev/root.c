@@ -12,26 +12,28 @@
 #define CHUNK 499				//defines max input possible
 #define EPSILON 0.00000000000001		//defines max accuracy for double precision
 
-int inputMode;
-bool debugMode;
+int inputMode;					//inputMode determines whetere or not the input is echoed back in case of file input
+bool debugMode;					//debug mode prints the small debuf statements littered throughout this code
 
-void menu();
 struct polydat GetPolyData();			//Constructs the polydat structure from user input
 void reconstruct(struct polydat);		//reconstructs the polynomial from info in polydat
 double function(struct polydat, double);	//returns the f(x)
 double bisect(struct polydat, double, double);	//Uses the bisection method to find root
 int** nDerivative(struct polydat,int);		//finds the nth derivative of a polynomial
 void destroyArr2d(int**);			//mainly made to destroy nDerivative 2d arrays
-void destroyArr(int*);
-int* normArr(struct polydat);
-int minExpo(struct polydat);
-int maxExpo(struct polydat);
+void destroyArr(int*);				//mainly made to destroy arrays
+int* normArr(struct polydat);			//takes the 2d array and makes a 1d array with exponents as index and coeffiecents as index values
+int minExpo(struct polydat);			//finds the minimum exponent
+int maxExpo(struct polydat);			//finds the maximum exponent
 bool precision(struct polydat, double);		//used to determine how close to zero our value is
 double newton(struct polydat);			//Uses the newtons method to find root
-double horner(struct polydat, int);		//
+void horner(struct polydat, double);		//prints the f(X) and f'(X) value using horners method
+void menu();					//Used for selection as to what the user would like to do
 
 int main()
 {
+
+	//Determine input mode and debug mode//
 	inputMode = 0;
 	int debug = 0;
 	printf("\n\nPlease select program input mode (file=1) (keyboard=2)\nInput Mode: ");
@@ -42,6 +44,7 @@ int main()
 	if(debug == 1)
 		debugMode = true;
 
+	//start the menu selection//
 	menu();
 
 	return 0;
@@ -56,6 +59,8 @@ void menu()
 	{
 		printf("\n\nWhat would you like to do?\n (New Polynomial = 1) (Find Root = 2) (Horners = 3) (Exit = 0)\n\nSelection: ");
 		scanf("%d", &input);
+		if(inputMode == 1)
+			printf("%d", input);
 		if(input == 1)
 			polyInfo = GetPolyData();
 		else if(input == 2)
@@ -68,7 +73,7 @@ void menu()
 			double xVal = 0;
 			printf("\n\nPlease provide x value for Horners Method: ");
 			scanf("%lf", &xVal);
-			horner(polyInfo,xVal);
+			horner(polyInfo, xVal);
 		}
 		else if(input == 0)
 			exit(1);
@@ -85,13 +90,19 @@ struct polydat GetPolyData()
 
 	struct polydat polyInfo;
 
+	//flush all stdin to ensure input is correctly recieved//
 	int flush;
 	while((flush = getchar()) != '\n' && flush !=EOF);
 
+
+	//take the raw polynomial input//
 	printf("\n\nPlease enter your polynomial: ");
 	fgets(userin, CHUNK, stdin);
-	printf("%s\n",userin);
+	if(inputMode == 1)
+		printf("%s\n",userin);
 
+
+	//start tokenizing the input to extract exponent and coefficents//
 	char *userinToken = strtok(userin,delimit);
 	int inAt=0;
 	char *val;
@@ -130,11 +141,17 @@ struct polydat GetPolyData()
 
 	polyInfo.termCount = inAt;
 
+
+	//deteremine point a and b//
 	char response[2]="";
 	printf("\nPlease enter point a: ");
-	scanf("%lf",&polyInfo.a); printf("%lf\n",polyInfo.a);
+	scanf("%lf",&polyInfo.a);
+	if(inputMode == 1)
+		printf("%lf\n",polyInfo.a);
 	printf("Please enter point b: ");
-	scanf("%lf",&polyInfo.b); printf("%lf\n",polyInfo.b);
+	scanf("%lf",&polyInfo.b);
+	if(inputMode == 1)
+		printf("%lf\n",polyInfo.b);
 	while(polyInfo.a>polyInfo.b)
 	{
 		printf("\nLooks like a is larger than b\nRetry? (y,n) => ");
@@ -181,6 +198,8 @@ double function(struct polydat polyInfo, double x)
 
 bool precision(struct polydat polyInfo, double x)
 {
+
+	//utitlizes the max possible precision of double//
 	int value = function(polyInfo,x);
 	if(function(polyInfo, x)==0 || (function(polyInfo, x) < EPSILON && function(polyInfo, x) > -EPSILON))
 	{
@@ -225,6 +244,7 @@ void destroyArr(int* arr)
 
 double bisect(struct polydat polyInfo, double a, double b)
 {
+	//recursively calls upon itself till it can hit max precision//
 
 	double mid = (a+b)/2;
 
@@ -244,6 +264,8 @@ double bisect(struct polydat polyInfo, double a, double b)
 double newton(struct polydat polyInfo)
 {
 	double xInit = (polyInfo.a+polyInfo.b)/2;
+	if(xInit == 0)
+		xInit = 0.666;
 	double xNext = xInit;
 
 	if(xInit==0)
@@ -315,7 +337,7 @@ int maxExpo(struct polydat polyInfo)
 	return maxExpo;
 }
 
-double horner(struct polydat polyInfo, int x)
+void horner(struct polydat polyInfo, double x)
 {
 	int *coeArr = normArr(polyInfo);
 	size_t coeArrSize = maxExpo(polyInfo) - minExpo(polyInfo);
@@ -330,7 +352,8 @@ double horner(struct polydat polyInfo, int x)
 		funcVal = coeArr[i] + (x * funcVal);
 	}
 
+	printf("\nHorners Value at F(%lf)=%lf and F'(%lf)=%lf", x, funcVal, x, derVal);
+
 
 	destroyArr(coeArr);
-	return funcVal;
 }
