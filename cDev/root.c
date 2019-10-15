@@ -31,15 +31,6 @@ int main()
 	struct polydat polyInfo = GetPolyData();
 	reconstruct(polyInfo);
 
-/*	int** der = nDerivative(polyInfo,7);
-	for(int i=0; i<polyInfo.termCount; i++)
-	{
-		polyInfo.coexpo[i][0] = der[i][0];
-		polyInfo.coexpo[i][1] = der[i][1];
-	}
-
-	reconstruct(polyInfo);
-*/
 	printf("\n\nBisected[%lf,%lf]: %lf\n", polyInfo.a, polyInfo.b, bisect(polyInfo, polyInfo.a, polyInfo.b));
 	printf("\n\nNetwonsR[%lf,%lf]: %lf\n", polyInfo.a, polyInfo.b, newton(polyInfo));
 
@@ -226,12 +217,14 @@ double newton(struct polydat polyInfo)
 
 	while(!precision(polyInfo,xNext))
 	{
-		int firstDerVal = function(firstDer,xNext);
+		double firstDerVal = function(firstDer,xNext);
 		if(precision(firstDer,xNext))
 			firstDerVal+=EPSILON;
 		printf("\n%.16lf",function(polyInfo,xNext));
 		xNext = xNext - (function(polyInfo,xNext)/firstDerVal);
-		printf("=>%.16lf",function(polyInfo,xNext));
+		printf("n=>%.16lf",function(polyInfo,xNext));
+		if(isinf(xNext))
+			break;
 	}
 
 	destroyArr2d(der);
@@ -281,14 +274,15 @@ double horner(struct polydat polyInfo, int x)
 	size_t coeArrSize = maxExpo(polyInfo) - minExpo(polyInfo);
 	double funcVal = coeArr[coeArrSize];
 	double derVal = 0;
-		printf("\n%d and funcVal=%lf\n",coeArr[0],funcVal);
+	printf("\n%d and funcVal=%lf\n",coeArr[0],funcVal);
 
 	for(int i=coeArrSize-1; i>=0; i--)
 	{
+		derVal = funcVal + (x * derVal);
 		funcVal = coeArr[i] + (x * funcVal);
-		printf("\n%d and funcVal=%lf\n",coeArr[i],funcVal);
 	}
 
 
+	destroyArr(coeArr);
 	return funcVal;
 }
