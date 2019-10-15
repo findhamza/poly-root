@@ -12,6 +12,10 @@
 #define CHUNK 499				//defines max input possible
 #define EPSILON 0.00000000000001		//defines max accuracy for double precision
 
+int inputMode;
+bool debugMode;
+
+void menu();
 struct polydat GetPolyData();			//Constructs the polydat structure from user input
 void reconstruct(struct polydat);		//reconstructs the polynomial from info in polydat
 double function(struct polydat, double);	//returns the f(x)
@@ -28,15 +32,48 @@ double horner(struct polydat, int);		//
 
 int main()
 {
-	struct polydat polyInfo = GetPolyData();
-	reconstruct(polyInfo);
+	inputMode = 0;
+	int debug = 0;
+	printf("\n\nPlease select program input mode (file=1) (keyboard=2)\nInput Mode: ");
+	scanf("%d", &inputMode);
+	printf("\n\nDebug Mode? (Yes=1) (No=0)\nDebug Mode: ");
+	scanf("%d", &debug);
 
-	printf("\n\nBisected[%lf,%lf]: %lf\n", polyInfo.a, polyInfo.b, bisect(polyInfo, polyInfo.a, polyInfo.b));
-	printf("\n\nNetwonsR[%lf,%lf]: %lf\n", polyInfo.a, polyInfo.b, newton(polyInfo));
+	if(debug == 1)
+		debugMode = true;
 
-	printf("\n\nF(2): %lf\nHorner-F(2): %lf", function(polyInfo,2), horner(polyInfo,2));
+	menu();
 
 	return 0;
+}
+
+void menu()
+{
+	struct polydat polyInfo = GetPolyData();
+	int input = INT_MIN;
+
+	while(input != 0)
+	{
+		printf("\n\nWhat would you like to do?\n (New Polynomial = 1) (Find Root = 2) (Horners = 3) (Exit = 0)\n\nSelection: ");
+		scanf("%d", &input);
+		if(input == 1)
+			polyInfo = GetPolyData();
+		else if(input == 2)
+		{
+			printf("\n\nBisected[%lf,%lf]: %lf\n", polyInfo.a, polyInfo.b, bisect(polyInfo, polyInfo.a, polyInfo.b));
+			printf("\n\nNetwonsR[%lf,%lf]: %lf\n", polyInfo.a, polyInfo.b, newton(polyInfo));
+		}
+		else if(input == 3)
+		{
+			double xVal = 0;
+			printf("\n\nPlease provide x value for Horners Method: ");
+			scanf("%lf", &xVal);
+			horner(polyInfo,xVal);
+		}
+		else if(input == 0)
+			exit(1);
+	}
+
 }
 
 struct polydat GetPolyData()
@@ -48,7 +85,10 @@ struct polydat GetPolyData()
 
 	struct polydat polyInfo;
 
-	printf("Please enter your polynomial: ");
+	int flush;
+	while((flush = getchar()) != '\n' && flush !=EOF);
+
+	printf("\n\nPlease enter your polynomial: ");
 	fgets(userin, CHUNK, stdin);
 	printf("%s\n",userin);
 
@@ -78,8 +118,8 @@ struct polydat GetPolyData()
 		else
 			expoval = 0;
 		polyInfo.coexpo[inAt][1] = expoval;
-
-		printf("\n%d\ncoe:%d\texpo:%d\n",inAt , polyInfo.coexpo[inAt][0], polyInfo.coexpo[inAt][1]);
+		if(debugMode == true)
+			printf("\n%d\ncoe:%d\texpo:%d\n",inAt , polyInfo.coexpo[inAt][0], polyInfo.coexpo[inAt][1]);
 
 		inAt++;
 		if(val==NULL)
@@ -188,7 +228,8 @@ double bisect(struct polydat polyInfo, double a, double b)
 
 	double mid = (a+b)/2;
 
-	printf("\nf(%lf/%lf=%lf)=%.16lf", a, b, mid, function(polyInfo, mid));
+	if(debugMode == true)
+		printf("\nf(%lf/%lf=%lf)=%.16lf", a, b, mid, function(polyInfo, mid));
 
 	if(precision(polyInfo,mid))
 		return mid;
@@ -205,6 +246,9 @@ double newton(struct polydat polyInfo)
 	double xInit = (polyInfo.a+polyInfo.b)/2;
 	double xNext = xInit;
 
+	if(xInit==0)
+		xInit = .1;
+
 	struct polydat firstDer = polyInfo;
 
 	int** der = nDerivative(firstDer,1);
@@ -220,9 +264,11 @@ double newton(struct polydat polyInfo)
 		double firstDerVal = function(firstDer,xNext);
 		if(precision(firstDer,xNext))
 			firstDerVal+=EPSILON;
-		printf("\n%.16lf",function(polyInfo,xNext));
+		if(debugMode == true)
+			printf("\n%.16lf",function(polyInfo,xNext));
 		xNext = xNext - (function(polyInfo,xNext)/firstDerVal);
-		printf("n=>%.16lf",function(polyInfo,xNext));
+		if(debugMode == true)
+			printf("n=>%.16lf",function(polyInfo,xNext));
 		if(isinf(xNext))
 			break;
 	}
@@ -240,7 +286,8 @@ int* normArr(struct polydat polyInfo)
 	for(int i=0; i<=polyInfo.termCount; i++)
 	{
 		coeArr[polyInfo.coexpo[i][1]] += polyInfo.coexpo[i][0];
-		printf("\ncoeArr[%d] == %d\n",polyInfo.coexpo[i][1], polyInfo.coexpo[i][0]);
+		if(debugMode == true)
+			printf("\ncoeArr[%d] == %d\n",polyInfo.coexpo[i][1], polyInfo.coexpo[i][0]);
 	}
 
 	return coeArr;
@@ -274,7 +321,8 @@ double horner(struct polydat polyInfo, int x)
 	size_t coeArrSize = maxExpo(polyInfo) - minExpo(polyInfo);
 	double funcVal = coeArr[coeArrSize];
 	double derVal = 0;
-	printf("\n%d and funcVal=%lf\n",coeArr[0],funcVal);
+	if(debugMode == true)
+		printf("\n%d and funcVal=%lf\n",coeArr[0],funcVal);
 
 	for(int i=coeArrSize-1; i>=0; i--)
 	{
